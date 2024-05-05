@@ -9,7 +9,7 @@ public class ArrayEditor {
             for (int j = 0; j < 10; j++) {
                 intArray[i][j] = i + j;
                 floatArray[i][j] = Float.parseFloat(String.valueOf(i + j));
-                strArray[i][j] = String.valueOf((char)(i + j));
+                strArray[i][j] = String.valueOf((char)(i + j + 65));
             }
         }
         System.out.println("Массив инициализирован");

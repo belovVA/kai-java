@@ -1,9 +1,5 @@
 package lab4.server;
-// Добавить подписи к стр и флоат массивам
-// изменить у сервера и клиента способ вх знач по варику
-// изменить  проверку на завершение соединения
-// Добавить отправку в журнал, как в клиенте, так и на сервере
-//
+
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -46,7 +42,7 @@ public class UPDServer {
                 byte[] operationData = new byte[LENGTH_PACKET];
                 DatagramPacket operationPacket = new DatagramPacket(operationData, operationData.length);
                 servSocket.receive(operationPacket);
-                String operation = new String(operationPacket.getData(), 0, operationPacket.getLength()).trim();
+                String operation = new String(operationPacket.getData(), 0, operationPacket.getLength()).replaceAll(" ", "");
                 String[] operation_split = operation.split(",");
 
                 String toThrow = "";
@@ -58,16 +54,16 @@ public class UPDServer {
                } else{
                     System.out.printf("Принято от клиента (id = %s):\n %s\n", operation_split[0], operation);
                     FEditor.save(String.format("Принято от клиента (id = %s):\n %s\n", operation_split[0], operation));
-                    if (Objects.equals(operation_split[1], "0")){
+                    System.out.println(operation_split[1]);
+                    if (Integer.parseInt(operation_split[1]) == 0){
                         // закрытие id
                         toThrow = remove_ID_client(operation_split[0]);
 
-                    } else  {
+                    } else  if (!(Integer.parseInt(operation_split[1]) == 3 & operation_split.length == 2)){
                         toThrow = request_processing(operation_split);
                     }
 
                 }
-//
 
                 clientAddr = operationPacket.getAddress();
                 clientPort = operationPacket.getPort();
@@ -78,9 +74,7 @@ public class UPDServer {
                 servSocket.send(datagram);
                 System.out.printf("Отправлено клиенту (id = %s):\n",operation_split[0]);
                 FEditor.save(String.format("Отправлено клиенту (id = %s):\n",operation_split[0]));
-
                 getSendData(data, FEditor);
-
             }
         } catch (SocketException e) {
             System.err.println("Ошибка при создании сокета: " + e.getMessage());
@@ -116,7 +110,6 @@ public class UPDServer {
                 toThrow += change_values(content);
                 break;
             case (3):
-//                System.out.println(Arrays.toString(content));
                 switch (content[0]) {
                     case ("1"):
                         toThrow = (Arrays.toString(editor.getLength("int")));

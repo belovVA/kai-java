@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class UPDClient {
     private static String ID;
-    private static final String PropertiesPath = "C:\\Users\\Vladimir\\Documents\\user\\3course\\2sem\\java\\lab4\\client\\config.properties";
+    private static final String PropertiesPath = "/Users/zubatshr/kai-java/lab4/client/config.properties";
     private static String HOST = "";
     private static int PORT;
     private static String JOURNAL_PATH = "";
@@ -19,6 +19,8 @@ public class UPDClient {
         if (get_settings(args) == 1){
             return;
         }
+        System.out.println(JOURNAL_PATH);
+
         FileEditorClient FEditor = new FileEditorClient(JOURNAL_PATH);
 
         getID(in, FEditor);
@@ -28,28 +30,30 @@ public class UPDClient {
             Scanner get = new Scanner(System.in);
 
             int operation = 1;
-            while (operation != 0){
+            while (true){
 
                 operation = getOperation(get);
                 if (operation == 0){
-                    continue;
+                    break;
                 }
+                // Создание запроса
                 String reqValues = "";
-
                 reqValues =  getRequest(operation);
-                String request = ID + "," +  operation + ","  + reqValues;
+                String request = (ID + "," +  operation + ","  + reqValues);
                 StringBuilder sb = new StringBuilder(request);
 
+                // При необходимости удаление последней запятой
                 if (sb.length() > 0 & (sb.lastIndexOf(",") == sb.length() - 1) ) {
                     sb.deleteCharAt(sb.length() - 1); // Удаляем последний символ
                 }
                 request = sb.toString();
 
+                // Формирование и отправка пакета
                 byte[] data = (request).getBytes();
                 DatagramPacket packet2 = new DatagramPacket(data, data.length, addr, PORT);
                 socket.send(packet2);
 
-                FEditor.save(new String(packet2.getData()).trim());
+                FEditor.save("Отправлено на сервер:"+(new String(packet2.getData())).trim());
                 System.out.println("Отправлено на сервер:"+(new String(packet2.getData())).trim());
 
                 // Получаем ответ от сервера
@@ -60,6 +64,7 @@ public class UPDClient {
                 // Преобразуем полученные данные в строку и выводим
                 String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
                 System.out.println("Получено от сервера:\n" + receivedMessage);
+                FEditor.save("Получено от сервера:\n" + receivedMessage);
 
             }
             close_socket_on_server(socket, ID, FEditor);
@@ -89,7 +94,7 @@ public class UPDClient {
                 DatagramPacket packet2 = new DatagramPacket(data2, data2.length, addr, PORT);
                 socket.send(packet2);
 
-                FEditor.save(new String(packet2.getData()).trim());
+                FEditor.save("Отправлено на сервер:"+(new String(packet2.getData())).trim());
                 System.out.println("Отправлено на сервер:"+(new String(packet2.getData())).trim());
 
                 // Получаем ответ от сервера
@@ -122,7 +127,6 @@ public class UPDClient {
         ArrayList<Integer> arrayTypes = new ArrayList<>();
         String req = "";
         int massType = 1;
-//        req = req + String.format("%d", operation);
         if (operation != 0){
             Scanner in = new Scanner(System.in);
             int indexRow, indexColumn;
@@ -140,14 +144,16 @@ public class UPDClient {
                     massType = 0;
                 }
             }
-
-            boolean match = arrayTypes.stream().allMatch(s -> s.equals(arrayTypes.get(0)));
-            if (match){
-                massType = arrayTypes.get(0);
-                req += String.format("%s", getNewValue(in, operation, massType));
-            } else if (operation == 2){
-                System.out.println("Вы ввели разные типы массивов. Введенные ячейки будут изменены на значения по умолчанию");
+            if (!arrayTypes.isEmpty()){
+                boolean match = arrayTypes.stream().allMatch(s -> s.equals(arrayTypes.get(0)));
+                if (match){
+                    massType = arrayTypes.get(0);
+                    req += String.format("%s", getNewValue(in, operation, massType));
+                } else if (operation == 2){
+                    System.out.println("Вы ввели разные типы массивов. Введенные ячейки будут изменены на значения по умолчанию");
+                }
             }
+
         }
         return req;
     }
@@ -226,7 +232,6 @@ public class UPDClient {
         } catch (Exception e) {
             System.err.println("Введен неверный тип данных нового значения");
         }
-//        System.out.println(req);
         return req;
     }
 
@@ -238,7 +243,7 @@ public class UPDClient {
             DatagramPacket packet2 = new DatagramPacket(data2, data2.length, addr, PORT);
             socket.send(packet2);
 
-            FEditor.save(new String(packet2.getData()).trim());
+            FEditor.save("Отправлено на сервер:"+(new String(packet2.getData())).trim());
             System.out.println("Отправлено на сервер:"+(new String(packet2.getData())).trim());
 
             // Получаем ответ от сервера
@@ -283,5 +288,6 @@ public class UPDClient {
         FileInputStream ip = new FileInputStream(PropertiesPath);
         pros.load(ip);
         JOURNAL_PATH = (pros.getProperty("LogFilePath"));
+
     }
 }
