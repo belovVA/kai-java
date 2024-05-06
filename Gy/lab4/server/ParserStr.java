@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ParserStr {
-    private String input;
+    private static String input;
     private List<Object> tokens;
 
     public ParserStr(String input) {
@@ -14,6 +14,9 @@ public class ParserStr {
     }
 
     public void parse() throws IllegalArgumentException {
+
+        checkValidChars();
+
         tokens.clear(); // Очищаем список токенов перед парсингом
 
         // Регулярное выражение для извлечения чисел (целых и дробных) и операций
@@ -71,5 +74,25 @@ public class ParserStr {
             default:
                 return 0;
         }
+    }
+
+    private static void checkValidChars() {
+        for (int i = 0; i < input.length(); i++) {
+            char ch = input.charAt(i);
+
+            if (!isValidChar(ch)) {
+                throw new IllegalArgumentException("Недопустимый символ в строке: " + ch);
+            }
+        }
+    }
+
+    private static boolean isValidChar(char ch) {
+        // Проверяем, является ли символ допустимым для арифметического выражения
+        return Character.isDigit(ch) || isOperator(ch) || ch == '.';
+    }
+
+    private static boolean isOperator(char ch) {
+        // Проверяем, является ли символ оператором (+, -, *, /)
+        return ch == '+' || ch == '-' || ch == '*' || ch == '/';
     }
 }

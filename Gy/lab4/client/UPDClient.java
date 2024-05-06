@@ -17,7 +17,7 @@ public class UPDClient {
     public static void main (String[] args) {
         Scanner in = new Scanner(System.in);
 
-        if (get_settings() == 1){
+        if (get_settings(in) == 1){
             return;
         }
 
@@ -67,12 +67,14 @@ public class UPDClient {
 
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            in.close();
         }
     }
 
     private static void getID(Scanner in, FileEditorClient FEditor){
         while (true){
-            System.out.print("Введите ID сервера: ");
+            System.out.print("Введите ID клиента: ");
             String strID = in.nextLine();
             try{
                 int temp = Integer.parseInt(strID);
@@ -176,8 +178,7 @@ public class UPDClient {
         }
     }
 
-    private static int get_settings(){
-        Scanner in = new Scanner(System.in);
+    private static int get_settings(Scanner in){
         int flag;
         try {
             System.out.print("Введите Адрес сервера: ");
@@ -185,9 +186,13 @@ public class UPDClient {
 
             System.out.print("Введите Порт сервера: ");
             PORT = in.nextInt();
+            in.nextLine();
 
             System.out.print("Введите Абсолтный путь до Журнала логов: ");
             JOURNAL_PATH = in.nextLine();
+
+            // Потом убрать
+            JOURNAL_PATH = "C:\\Users\\Vladimir\\Documents\\user\\3course\\2sem\\java\\Gy\\lab4\\client\\log.txt";
 
             System.out.printf("Клиент запущен. Адрес сервера: %s, Порт сервера %d\n", HOST, PORT);
             flag =  0;
@@ -197,9 +202,6 @@ public class UPDClient {
         } catch (Exception e) {
             System.err.println("Что-то пошло не так");
             flag =  1;
-        } finally {
-            in.close();
-
         }
         return flag;
     }

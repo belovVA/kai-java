@@ -46,8 +46,10 @@ public class UPDServer {
                     toThrow = remove_ID_client(operation_split[0]);
 
                 } else{
+                    System.out.println(operation);
                     System.out.printf("Принято от клиента (id = %s):\n %s\n", operation_split[0], operation);
                     FEditor.save(String.format("Принято от клиента (id = %s):\n %s\n", operation_split[0], operation));
+                    operation = get_arithmetic_expression(operation);
                     toThrow = request_processing(operation);
                 }
 
@@ -83,15 +85,16 @@ public class UPDServer {
     }
 
     private static String request_processing(String request) {
+        System.out.println("Строка в функции " + request);
         String toThrow = "";
         ParserStr parser = new ParserStr(request);
         try {
             parser.parse(); // Парсим строку
             List<Object> tokens = parser.getTokens(); // Получаем список токенов
-            System.out.println("Токены после парсинга:");
-            for (Object token : tokens) {
-                System.out.println(token);
-            }
+//            System.out.println("Токены после парсинга:");
+//            for (Object token : tokens) {
+//                System.out.println(token);
+//            }
 
             Arithmetic arithmetic = new Arithmetic(tokens);
             arithmetic.evaluate(); // Выполняем вычисления
@@ -143,6 +146,25 @@ public class UPDServer {
             toThrow = String.format(" клиент (id = %s) не найден из работающих ID", id);
         }
         return toThrow;
+    }
+
+    private static String get_arithmetic_expression(String request){
+        int firstCommaIndex = request.indexOf(',');
+        String result = "";
+        if (firstCommaIndex != -1) {
+            // Находим позицию второго вхождения ',' начиная с позиции после первого вхождения
+            int secondCommaIndex = request.indexOf(',', firstCommaIndex + 1);
+
+            if (secondCommaIndex != -1) {
+                // Обрезаем строку правее второго вхождения ','
+                 result = request.substring(secondCommaIndex + 1);
+            } else {
+                System.err.println("Второго вхождения ',' не найдено");
+            }
+        } else {
+            System.err.println("Первого вхождения ',' не найдено");
+        }
+        return result;
     }
 }
 
