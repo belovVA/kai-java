@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/2й семестр.iml" filepath="$PROJECT_DIR$/2й семестр.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Valiev/Valiev.iml" filepath="$PROJECT_DIR$/Valiev/Valiev.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/kai-java.iml" filepath="$PROJECT_DIR$/.idea/kai-java.iml" />
     </modules>
   </component>
 </project>
