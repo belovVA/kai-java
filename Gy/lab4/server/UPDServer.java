@@ -10,11 +10,6 @@ public class UPDServer {
     private static String JOURNAL_PATH;
 
     public static void main(String[] args) {
-        if (!Arrays.asList(args).isEmpty())
-            JOURNAL_PATH = args[0];
-
-        FileEditor FEditor = new FileEditor(JOURNAL_PATH);
-
         DatagramSocket servSocket = null;
         DatagramPacket datagram;
         InetAddress clientAddr;
@@ -24,17 +19,22 @@ public class UPDServer {
         if (get_settings(args) == 1) {
             return;
         }
+        FileEditor FEditor = new FileEditor(JOURNAL_PATH);
+
         try {
             servSocket = new DatagramSocket(PORT);
             System.out.println("Ожидание пакетов от клиента...");
 
             while (true) {
+                // Получение пакета
                 byte[] operationData = new byte[LENGTH_PACKET];
                 DatagramPacket operationPacket = new DatagramPacket(operationData, operationData.length);
                 servSocket.receive(operationPacket);
+                // Формирование строки из пакета
                 String operation = new String(operationPacket.getData(), 0, operationPacket.getLength()).replaceAll(" ", "");
                 String[] operation_split = operation.split(",");
 
+                // Работа со строкой
                 String toThrow = "";
                 if (operation_split.length == 1) {
                     // Добавление id клиента
@@ -46,22 +46,23 @@ public class UPDServer {
                     toThrow = remove_ID_client(operation_split[0]);
 
                 } else{
-                    System.out.println(operation);
-                    System.out.printf("Принято от клиента (id = %s):\n %s\n", operation_split[0], operation);
-                    FEditor.save(String.format("Принято от клиента (id = %s):\n %s\n", operation_split[0], operation));
+                    System.out.printf("Принято от клиента (id = %s): %s\n", operation_split[0], operation);
+                    FEditor.save(String.format("Принято от клиента (id = %s): %s", operation_split[0], operation));
                     operation = get_arithmetic_expression(operation);
                     toThrow = request_processing(operation);
                 }
 
+                // Получение адреса и порта клиента из полученного пакета
                 clientAddr = operationPacket.getAddress();
                 clientPort = operationPacket.getPort();
 
+                // Отправка и вывод результата
                 operationPacket.setData(((toThrow).trim()).getBytes());
                 data = operationPacket.getData();
                 datagram = new DatagramPacket(data, data.length, clientAddr, clientPort);
                 servSocket.send(datagram);
-                System.out.printf("Отправлено клиенту (id = %s):\n", operation_split[0]);
-                FEditor.save(String.format("Отправлено клиенту (id = %s):\n", operation_split[0]));
+                System.out.printf("Отправлено клиенту (id = %s):", operation_split[0]);
+                FEditor.save(String.format("Отправлено клиенту (id = %s):", operation_split[0]));
                 getSendData(data, FEditor);
             }
         } catch (SocketException e) {
@@ -75,6 +76,7 @@ public class UPDServer {
         }
     }
 
+    // Проверка ID на валидность
     private static String check_ID_client(String request) {
         if (IDClients.contains(request)) {
             return String.valueOf(false);
@@ -84,22 +86,19 @@ public class UPDServer {
         }
     }
 
+    // Работа со строкой запроса и получение результата
     private static String request_processing(String request) {
-        System.out.println("Строка в функции " + request);
         String toThrow = "";
         ParserStr parser = new ParserStr(request);
         try {
             parser.parse(); // Парсим строку
             List<Object> tokens = parser.getTokens(); // Получаем список токенов
-//            System.out.println("Токены после парсинга:");
-//            for (Object token : tokens) {
-//                System.out.println(token);
-//            }
 
             Arithmetic arithmetic = new Arithmetic(tokens);
             arithmetic.evaluate(); // Выполняем вычисления
+
             double result = arithmetic.getResult(); // Получаем результат
-            toThrow =  "Результат вычисления: " + result;
+            toThrow =  "Результат вычисления: " + request  + " = " + result;
         } catch (IllegalArgumentException e) {
             toThrow = "Ошибка: " + e.getMessage();
         } catch (ArithmeticException e) {
@@ -108,12 +107,15 @@ public class UPDServer {
         return toThrow;
     }
 
+    // Функция вывода содержимого отправленного пакета данных
     private static void getSendData(byte[] b, FileEditor FEditor) {
         System.out.println(new String(b));
         FEditor.save(new String(b));
         byte[] result = new byte[b.length];
         System.arraycopy(b, 0, result, 0, b.length);
     }
+
+    // Получение настроек при запуске сервера
     private static int get_settings(String[] args) {
         Scanner in = new Scanner(System.in);
         int flag;
@@ -138,6 +140,7 @@ public class UPDServer {
         return flag;
     }
 
+    // удаление ID клиента из списка при закрытии сокета
     private static String remove_ID_client(String id){
         String toThrow = "";
         if (IDClients.remove(id)){
@@ -148,6 +151,7 @@ public class UPDServer {
         return toThrow;
     }
 
+    // Переделка запроса в арифм выржение путем отсечения начальной части строки
     private static String get_arithmetic_expression(String request){
         int firstCommaIndex = request.indexOf(',');
         String result = "";

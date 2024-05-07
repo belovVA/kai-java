@@ -3,13 +3,11 @@ package lab4.client;
 import java.io.*;
 import java.net.*;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.Scanner;
 import java.util.ArrayList;
 
 public class UPDClient {
     private static String ID;
-    private static final String PropertiesPath = "/Users/zubatshr/kai-java/lab4/client/config.properties";
     private static String HOST = "";
     private static int PORT;
     private static String JOURNAL_PATH = "";
@@ -17,13 +15,15 @@ public class UPDClient {
     public static void main (String[] args) {
         Scanner in = new Scanner(System.in);
 
+        // Получение настроек клиента
         if (get_settings(in) == 1){
             return;
         }
-
         FileEditorClient FEditor = new FileEditorClient(JOURNAL_PATH);
 
+        // Получение ID
         getID(in, FEditor);
+
         try {
             InetAddress addr = InetAddress.getByName(HOST);
             DatagramSocket socket = new DatagramSocket();
@@ -32,6 +32,7 @@ public class UPDClient {
             int operation = 1;
             while (true){
 
+                // Получение операции
                 operation = getOperation(get);
                 if (operation == 0){
                     break;
@@ -72,6 +73,7 @@ public class UPDClient {
         }
     }
 
+    // Получение ID и проверка на занятость на сервере
     private static void getID(Scanner in, FileEditorClient FEditor){
         while (true){
             System.out.print("Введите ID клиента: ");
@@ -100,7 +102,7 @@ public class UPDClient {
 
                 // Преобразуем полученные данные в строку и выводим
                 String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
-                System.out.println("Получено от сервера:\n" + receivedMessage);
+                System.out.println("Получено от сервера:" + receivedMessage);
                 if (receivedMessage.equals("true")){
                     ID = "_"+ strID;
                     socket.close();
@@ -119,6 +121,8 @@ public class UPDClient {
         }
 
     }
+
+    // Формирование строки запроса
     private static String getRequest(int operation) {
         ArrayList<Integer> arrayTypes = new ArrayList<>();
         String req = "";
@@ -135,6 +139,7 @@ public class UPDClient {
         return req;
     }
 
+    // Получение операции
     private static int  getOperation(Scanner in) {
         while (true) {
             System.out.print("\n1. Ввести выражение\n" +
@@ -150,9 +155,9 @@ public class UPDClient {
     }
 
 
-
+    // Закрытие сокета на сервере
     private static void close_socket_on_server(DatagramSocket socket, String ID, FileEditorClient FEditor){
-        String toThrow = String.format("%s, 0", ID);
+        String toThrow = String.format("%s,0", ID);
         try {
             InetAddress addr = InetAddress.getByName(HOST);
             byte[] data2 = (toThrow).getBytes();
@@ -178,6 +183,7 @@ public class UPDClient {
         }
     }
 
+    // Получение настроек клиента при запуске
     private static int get_settings(Scanner in){
         int flag;
         try {
@@ -190,9 +196,6 @@ public class UPDClient {
 
             System.out.print("Введите Абсолтный путь до Журнала логов: ");
             JOURNAL_PATH = in.nextLine();
-
-            // Потом убрать
-            JOURNAL_PATH = "C:\\Users\\Vladimir\\Documents\\user\\3course\\2sem\\java\\Gy\\lab4\\client\\log.txt";
 
             System.out.printf("Клиент запущен. Адрес сервера: %s, Порт сервера %d\n", HOST, PORT);
             flag =  0;
