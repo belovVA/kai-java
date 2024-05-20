@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class UPDClient {
     private static String ID;
-    private static final String PropertiesPath = "/Users/zubatshr/kai-java/lab4/client/config.properties";
+    private static final String PropertiesPath = "C:/Users/Vladimir/Documents/user/3course/2sem/java/lab4/client/config.properties";
     private static String HOST = "";
     private static int PORT;
     private static String JOURNAL_PATH = "";
