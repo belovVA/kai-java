@@ -94,6 +94,8 @@ public class Test extends JFrame {
         int dx = random.nextInt(speed) + 1;
         int dy = (int) Math.sqrt(speed * speed - dx * dx);
         Figure figure = new Figure(0, 0, dx, dy, 30, color, shape, number);
+        figure.setSpeed(speed, speed);
+
         demoPanel.addFigure(figure);
         figureComboBox.addItem(shape + ", ID=" + number);
         usedNumbers.add(number);
@@ -113,8 +115,8 @@ public class Test extends JFrame {
 
         if (figure != null) {
             String newShape = shapeField.getText().toLowerCase();
-            if (!figure.shape.equals(newShape)) {
-                JOptionPane.showMessageDialog(this, "Изменение формы фигуры не поддерживается.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            if (!validShapes.contains(newShape)) {
+                JOptionPane.showMessageDialog(this, "Неверная фигура. Допустимые фигуры: круг, овал, треугольник, квадрат, прямоугольник.", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -128,6 +130,7 @@ public class Test extends JFrame {
 
                 figure.setSpeed(newSpeed, newSpeed); // Простое назначение скорости одинаково по x и y
                 figure.setColor(newColor);
+                figure.setShape(newShape);
 
                 // Обновление ID фигуры
                 int newNumber = Integer.parseInt(numberField.getText());
@@ -139,15 +142,11 @@ public class Test extends JFrame {
                     usedNumbers.remove(figure.number);
                     figure.setNumber(newNumber);
                     usedNumbers.add(newNumber);
-
-                    // Обновление списка фигур
-                    figureComboBox.removeItem(selectedFigure);
-                    figureComboBox.addItem(figure.shape + ", ID=" + newNumber);
-                } else {
-                    // Обновление списка фигур
-                    figureComboBox.removeItem(selectedFigure);
-                    figureComboBox.addItem(figure.shape + ", ID=" + newNumber);
                 }
+
+                // Обновление списка фигур
+                figureComboBox.removeItem(selectedFigure);
+                figureComboBox.addItem(figure.shape + ", ID=" + newNumber);
 
                 clearFields(); // Очищаем текстовые поля после изменения фигуры
             } catch (NumberFormatException e) {
@@ -202,7 +201,6 @@ public class Test extends JFrame {
             colorComboBox.setSelectedItem(colorName);
         }
     }
-
     private void clearFields() {
         shapeField.setText("");
         speedField.setText("");

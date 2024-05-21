@@ -63,6 +63,10 @@ class Figure {
         this.dy = dy;
     }
 
+    public void setShape(String shape) {
+        this.shape = shape;
+    }
+
     public void setNumber(int number) {
         this.number = number;
     }
@@ -103,4 +107,3 @@ class DemoPanel extends JPanel {
         }
     }
 }
-
