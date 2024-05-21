@@ -53,6 +53,7 @@ public class Test extends JFrame {
         JFrame demoFrame = new JFrame("Демонстрационное окно");
         demoFrame.setSize(400, 400);
         demoFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        demoFrame.setResizable(false); // Запрещаем изменение размеров окна
         demoFrame.add(demoPanel);
         demoFrame.setVisible(true);
 
@@ -152,6 +153,25 @@ public class Test extends JFrame {
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Скорость и номер должны быть числами.", "Ошибка", JOptionPane.ERROR_MESSAGE);
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "Фигура не найдена.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private Color getColorFromName(String colorName) {
+        switch (colorName.toLowerCase()) {
+            case "красный":
+                return Color.RED;
+            case "зеленый":
+                return Color.GREEN;
+            case "синий":
+                return Color.BLUE;
+            case "желтый":
+                return Color.YELLOW;
+            case "черный":
+                return Color.BLACK;
+            default:
+                return Color.BLACK;
         }
     }
 
@@ -166,9 +186,20 @@ public class Test extends JFrame {
 
         if (figure != null) {
             shapeField.setText(figure.shape);
-            speedField.setText(String.valueOf(figure.getSpeed()));
-            numberField.setText(String.valueOf(figure.number));
-            colorComboBox.setSelectedItem(getNameFromColor(figure.color));
+            speedField.setText("" + figure.getSpeed());
+            numberField.setText("" + figure.number);
+
+            String colorName = "Черный";
+            if (figure.color.equals(Color.RED)) {
+                colorName = "Красный";
+            } else if (figure.color.equals(Color.GREEN)) {
+                colorName = "Зеленый";
+            } else if (figure.color.equals(Color.BLUE)) {
+                colorName = "Синий";
+            } else if (figure.color.equals(Color.YELLOW)) {
+                colorName = "Желтый";
+            }
+            colorComboBox.setSelectedItem(colorName);
         }
     }
 
@@ -177,33 +208,6 @@ public class Test extends JFrame {
         speedField.setText("");
         numberField.setText("");
         colorComboBox.setSelectedIndex(0);
-        figureComboBox.setSelectedIndex(0);
-    }
-
-    private Color getColorFromName(String colorName) {
-        switch (colorName) {
-            case "Красный":
-                return Color.RED;
-            case "Зеленый":
-                return Color.GREEN;
-            case "Синий":
-                return Color.BLUE;
-            case "Желтый":
-                return Color.YELLOW;
-            case "Черный":
-                return Color.BLACK;
-            default:
-                return Color.BLACK;
-        }
-    }
-
-    private String getNameFromColor(Color color) {
-        if (Color.RED.equals(color)) return "Красный";
-        if (Color.GREEN.equals(color)) return "Зеленый";
-        if (Color.BLUE.equals(color)) return "Синий";
-        if (Color.YELLOW.equals(color)) return "Желтый";
-        if (Color.BLACK.equals(color)) return "Черный";
-        return "Черный";
     }
 
     public static void main(String[] args) {
