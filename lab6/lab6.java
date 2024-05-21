@@ -104,4 +104,3 @@ class DemoPanel extends JPanel {
     }
 }
 
-
