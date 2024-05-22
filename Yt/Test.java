@@ -8,11 +8,11 @@ import java.util.Set;
 public class Test extends JFrame {
     private DemoPanel demoPanel;
     private JTextField contentField, numberField;
-    private JComboBox<String> figureComboBox, speedComboBox, colorComboBox;
+    private JComboBox<String> figureComboBox, speedComboBox;
     private Timer timer;
     private Set<Integer> usedNumbers = new HashSet<>();
     private final Set<String> validContents = Set.of("картинка");
-//    private Color selectedColor = Color.BLACK; // Выбранный цвет по умолчанию
+    private Color selectedColor = Color.BLACK; // Выбранный цвет по умолчанию
 
     public Test() {
         setTitle("Управляющее окно");
@@ -28,37 +28,31 @@ public class Test extends JFrame {
         add(new JLabel("Номер:"));
         add(numberField);
 
-//        // Убираем выпадающий список выбора цвета и заменяем его кнопкой
-//        JButton colorButton = new JButton("Выбрать цвет");
-//        colorButton.addActionListener(e -> {
-//            Color newColor = JColorChooser.showDialog(this, "Выберите цвет текста", selectedColor);
-//            if (newColor != null) {
-//                selectedColor = newColor;
-//            }
-//        });
-//        add(new JLabel("Цвет текста:"));
-//        add(colorButton);
-        String[] colors = {"Красный", "Зеленый", "Синий", "Желтый", "Черный"};
-        colorComboBox = new JComboBox<>(colors);
-        add(new JLabel("Цвет:"));
-        add(colorComboBox);
+        // Убираем выпадающий список выбора цвета и заменяем его кнопкой
+        JButton colorButton = new JButton("Выбрать цвет");
+        colorButton.addActionListener(e -> {
+            Color newColor = JColorChooser.showDialog(this, "Выберите цвет текста", selectedColor);
+            if (newColor != null) {
+                selectedColor = newColor;
+            }
+        });
+        add(new JLabel("Цвет текста:"));
+        add(colorButton);
 
         String[] speeds = {"1", "10", "20", "30", "50", "100"};
         speedComboBox = new JComboBox<>(speeds);
         add(new JLabel("Скорость:"));
         add(speedComboBox);
 
-
-
-        JButton startButton = new JButton("Пуск");
-        startButton.addActionListener(e -> startFigure());
-        add(startButton);
-
         figureComboBox = new JComboBox<>();
         figureComboBox.addItem(""); // Добавляем пустую строку
         figureComboBox.addActionListener(e -> loadFigureData());
         add(new JLabel("Выбор объекта:"));
         add(figureComboBox);
+
+        JButton startButton = new JButton("Пуск");
+        startButton.addActionListener(e -> startFigure());
+        add(startButton);
 
         JButton editButton = new JButton("Изменить");
         editButton.addActionListener(e -> editFigure());
@@ -94,11 +88,11 @@ public class Test extends JFrame {
             JOptionPane.showMessageDialog(this, "Номер уже используется. Введите уникальный номер.", "Ошибка", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        Color color = getColorFromName((String) colorComboBox.getSelectedItem());
+
         Random random = new Random();
         int dx = random.nextInt(speed) + 1;
         int dy = (int) Math.sqrt(speed * speed - dx * dx);
-        Figure figure = new Figure(0, 0, dx, dy, 30, color, content, number, isImage);
+        Figure figure = new Figure(0, 0, dx, dy, 30, selectedColor, content, number, isImage);
         figure.setSpeed(speed, speed);
         demoPanel.addFigure(figure);
         figureComboBox.addItem(content + ", ID=" + number);
@@ -108,22 +102,6 @@ public class Test extends JFrame {
         demoPanel.repaint(); // Обновляем отрисовку панели
     }
 
-    private Color getColorFromName(String colorName) {
-        switch (colorName.toLowerCase()) {
-            case "красный":
-                return Color.RED;
-            case "зеленый":
-                return Color.GREEN;
-            case "синий":
-                return Color.BLUE;
-            case "желтый":
-                return Color.YELLOW;
-            case "черный":
-                return Color.BLACK;
-            default:
-                return Color.BLACK;
-        }
-    }
     private void editFigure() {
         String selectedFigure = (String) figureComboBox.getSelectedItem();
         if (selectedFigure == null || selectedFigure.isEmpty()) {
@@ -137,9 +115,9 @@ public class Test extends JFrame {
         if (figure != null) {
             try {
                 int newSpeed = Integer.parseInt((String) speedComboBox.getSelectedItem());
-                Color newColor = getColorFromName((String) colorComboBox.getSelectedItem());
+
                 figure.setSpeed(newSpeed, newSpeed); // Простое назначение скорости одинаково по x и y
-                figure.setColor(newColor);
+                figure.setColor(selectedColor);
 
                 // Обновление текста фигуры
                 String newContent = contentField.getText().toLowerCase();
@@ -182,17 +160,7 @@ public class Test extends JFrame {
             contentField.setText(figure.content);
             speedComboBox.setSelectedItem("" + figure.getSpeed() / 10);
             numberField.setText("" + figure.number);
-            String colorName = "Черный";
-            if (figure.color.equals(Color.RED)) {
-                colorName = "Красный";
-            } else if (figure.color.equals(Color.GREEN)) {
-                colorName = "Зеленый";
-            } else if (figure.color.equals(Color.BLUE)) {
-                colorName = "Синий";
-            } else if (figure.color.equals(Color.YELLOW)) {
-                colorName = "Желтый";
-            }
-            colorComboBox.setSelectedItem(colorName);
+            selectedColor = figure.color; // Обновляем выбранный цвет
         }
     }
 

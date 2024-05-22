@@ -1,3 +1,4 @@
+//  1100010011
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -9,7 +10,6 @@ import java.util.Set;
 class Figure {
     int x, y, dx, dy, size, number;
     Color color;
-    String shape;
     String content;
     boolean isImage;
 
@@ -54,12 +54,9 @@ class Figure {
     }
 
     public void setContent(String content, boolean isImage){
-        this.content = content;
-            this.isImage = isImage;
+            this.content = content;
+                this.isImage = isImage;
 
-    }
-    public void setNumber(int number) {
-        this.number = number;
     }
 
     public int getSpeed() {
@@ -71,6 +68,8 @@ class DemoPanel extends JPanel {
     ArrayList<Figure> figures = new ArrayList<>();
     Image image;
 
+    int tempId = 0;
+
     public DemoPanel() {
         try {
             image = new ImageIcon("/Users/zubatshr/kai-java/Va/laba6_Valiev/logo.jpeg").getImage();
@@ -78,7 +77,17 @@ class DemoPanel extends JPanel {
             e.printStackTrace();
         }
     }
+    public int getFiguresCount() {
+        return figures.size();
+    }
 
+    public int getId(){
+        return tempId;
+    }
+
+    public void incId(){
+        this.tempId ++;
+    }
     public void addFigure(Figure figure) {
         figures.add(figure);
     }

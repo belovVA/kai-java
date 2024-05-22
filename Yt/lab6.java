@@ -54,9 +54,10 @@ class Figure {
     }
 
     public void setContent(String content, boolean isImage){
-        this.content = content;
-            this.isImage = isImage;
+        if (!isImage){
+            this.content = content;
 
+        }
     }
     public void setNumber(int number) {
         this.number = number;

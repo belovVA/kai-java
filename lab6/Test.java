@@ -35,15 +35,17 @@ public class Test extends JFrame {
         add(new JLabel("Цвет:"));
         add(colorComboBox);
 
+
+
+        JButton startButton = new JButton("Пуск");
+        startButton.addActionListener(e -> startFigure());
+        add(startButton);
+
         figureComboBox = new JComboBox<>();
         figureComboBox.addItem(""); // Добавляем пустую строку
         figureComboBox.addActionListener(e -> loadFigureData());
         add(new JLabel("Выбор фигуры:"));
         add(figureComboBox);
-
-        JButton startButton = new JButton("Пуск");
-        startButton.addActionListener(e -> startFigure());
-        add(startButton);
 
         JButton editButton = new JButton("Изменить");
         editButton.addActionListener(e -> editFigure());
@@ -95,7 +97,6 @@ public class Test extends JFrame {
         int dy = (int) Math.sqrt(speed * speed - dx * dx);
         Figure figure = new Figure(0, 0, dx, dy, 30, color, shape, number);
         figure.setSpeed(speed, speed);
-
         demoPanel.addFigure(figure);
         figureComboBox.addItem(shape + ", ID=" + number);
         usedNumbers.add(number);
