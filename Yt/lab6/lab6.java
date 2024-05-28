@@ -1,3 +1,4 @@
+//  1100010011
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -9,7 +10,6 @@ import java.util.Set;
 class Figure {
     int x, y, dx, dy, size, number;
     Color color;
-    String shape;
     String content;
     boolean isImage;
 
@@ -32,6 +32,10 @@ class Figure {
         if (y < 0 || y + size > height) dy = -dy;
     }
 
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
     public void draw(Graphics g, Image image) {
         g.setColor(color);
         if (isImage) {
@@ -41,7 +45,7 @@ class Figure {
             g.drawString(content, x, y + size);
         }
         g.setColor(Color.BLACK);
-        g.drawString("" + number, x, y - 5);
+        g.drawString("" + number, x + 1, y + 1);
     }
 
     public void setColor(Color color) {
@@ -54,13 +58,9 @@ class Figure {
     }
 
     public void setContent(String content, boolean isImage){
-        if (!isImage){
-            this.content = content;
+        this.content = content;
+        this.isImage = isImage;
 
-        }
-    }
-    public void setNumber(int number) {
-        this.number = number;
     }
 
     public int getSpeed() {
@@ -72,6 +72,8 @@ class DemoPanel extends JPanel {
     ArrayList<Figure> figures = new ArrayList<>();
     Image image;
 
+    int tempId = 0;
+
     public DemoPanel() {
         try {
             image = new ImageIcon("/Users/zubatshr/kai-java/Va/laba6_Valiev/logo.jpeg").getImage();
@@ -79,7 +81,17 @@ class DemoPanel extends JPanel {
             e.printStackTrace();
         }
     }
+    public int getFiguresCount() {
+        return figures.size();
+    }
 
+    public int getId(){
+        return tempId;
+    }
+
+    public void incId(){
+        this.tempId ++;
+    }
     public void addFigure(Figure figure) {
         figures.add(figure);
     }

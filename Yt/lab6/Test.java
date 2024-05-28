@@ -1,18 +1,21 @@
-//  0101101110
+// 1100011101
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
 public class Test extends JFrame {
     private DemoPanel demoPanel;
-    private JTextField contentField, numberField;
-    private JComboBox<String> figureComboBox, speedComboBox;
+    private JTextField  speedField, selectField, numberField, newNuberField, newSpeedField;
+    private JComboBox<String>  colorComboBox, contendComboBox, newcolorComboBox, newcontendComboBox;
     private Timer timer;
     private Set<Integer> usedNumbers = new HashSet<>();
-    private final Set<String> validContents = Set.of("картинка");
-    private Color selectedColor = Color.BLACK; // Выбранный цвет по умолчанию
+    private final Set<String> validContents = Set.of("picture");
+    //    private Color selectedColor = Color.BLACK; // Выбранный цвет по умолчанию
+    private final int MAX_FIGURES = 5;  // Максимальное количество фигур
+
 
     public Test() {
         setTitle("Управляющее окно");
@@ -20,49 +23,62 @@ public class Test extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridLayout(0, 1)); // Используем GridLayout для размещения компонентов по одной строке
 
-        contentField = new JTextField(10);
-        add(new JLabel("Содержимое:"));
-        add(contentField);
+        String[] contents = {"", "Hellow", "Kai", "Amir", "Lab6", "picture"};
+        contendComboBox = new JComboBox<>(contents);
+        add(new JLabel(" Содержимое:"));
+        add(contendComboBox);
+
+        String[] colors = {"Красный", "Зеленый", "Синий", "Желтый", "Черный"};
+        colorComboBox = new JComboBox<>(colors);
+        add(new JLabel("Цвет:"));
+        add(colorComboBox);
+
+        speedField = new JTextField(5);
+        add(new JLabel("Скорость:"));
+        add(speedField);
 
         numberField = new JTextField(5);
         add(new JLabel("Номер:"));
         add(numberField);
 
-        // Убираем выпадающий список выбора цвета и заменяем его кнопкой
-        JButton colorButton = new JButton("Выбрать цвет");
-        colorButton.addActionListener(e -> {
-            Color newColor = JColorChooser.showDialog(this, "Выберите цвет текста", selectedColor);
-            if (newColor != null) {
-                selectedColor = newColor;
-            }
-        });
-        add(new JLabel("Цвет текста:"));
-        add(colorButton);
-
-        String[] speeds = {"1", "10", "20", "30", "50", "100"};
-        speedComboBox = new JComboBox<>(speeds);
-        add(new JLabel("Скорость:"));
-        add(speedComboBox);
-
-        figureComboBox = new JComboBox<>();
-        figureComboBox.addItem(""); // Добавляем пустую строку
-        figureComboBox.addActionListener(e -> loadFigureData());
-        add(new JLabel("Выбор объекта:"));
-        add(figureComboBox);
-
         JButton startButton = new JButton("Пуск");
         startButton.addActionListener(e -> startFigure());
         add(startButton);
 
-        JButton editButton = new JButton("Изменить");
-        editButton.addActionListener(e -> editFigure());
-        add(editButton);
+        selectField = new JTextField(5);
+        add(new JLabel("ID для изменения:"));
+        add(selectField);
+
+        JButton showButton = new JButton("Изменить");
+        showButton.addActionListener(e -> loadFigureData());
+        add(showButton);
+//         contents = {"", "Hellow", "Kai", "World", "Bye", "Lab6", "picture"};
+        newcontendComboBox = new JComboBox<>(contents);
+        add(new JLabel(" Содержимое:"));
+        add(newcontendComboBox);
+
+        newSpeedField = new JTextField(5);
+        add(new JLabel("Скорость:"));
+        add(newSpeedField);
+
+        newNuberField = new JTextField(5);
+        add(new JLabel("Номер:"));
+        add(newNuberField);
+
+//        String colors = {"Красный", "Зеленый", "Синий", "Желтый", "Черный"};
+        newcolorComboBox = new JComboBox<>(colors);
+        add(new JLabel("Цвет:"));
+        add(newcolorComboBox);
+
+        JButton saveButton = new JButton("Сохранить");
+        saveButton.addActionListener(e -> editFigure());
+        add(saveButton);
+
 
         demoPanel = new DemoPanel();
         JFrame demoFrame = new JFrame("Демонстрационное окно");
         demoFrame.setSize(400, 400);
         demoFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        demoFrame.setResizable(false); // Запрещаем изменение размеров окна
         demoFrame.add(demoPanel);
         demoFrame.setVisible(true);
 
@@ -71,13 +87,26 @@ public class Test extends JFrame {
     }
 
     private void startFigure() {
-        String content = contentField.getText().toLowerCase();
+        if (demoPanel.getFiguresCount() >= MAX_FIGURES) {
+            JOptionPane.showMessageDialog(this, "Достигнуто максимальное количество фигур.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        String content = (String) contendComboBox.getSelectedItem();
+        if (Objects.equals(content, "")){
+            JOptionPane.showMessageDialog(this, "Поле содержимого не должно быть пустым.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         boolean isImage = validContents.contains(content);
         int speed;
         int number;
 
         try {
-            speed = Integer.parseInt((String) speedComboBox.getSelectedItem());
+            speed = Integer.parseInt(speedField.getText());
+            if (speed <= 0 || speed > 20) {
+                JOptionPane.showMessageDialog(this, "Скорость должна быть в диапазоне от 1 до 20.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+//            speed = Integer.parseInt((String) speedComboBox.getSelectedItem());
             number = Integer.parseInt(numberField.getText());
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Номер должен быть числом.", "Ошибка", JOptionPane.ERROR_MESSAGE);
@@ -88,14 +117,19 @@ public class Test extends JFrame {
             JOptionPane.showMessageDialog(this, "Номер уже используется. Введите уникальный номер.", "Ошибка", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        Color color = getColorFromName((String) colorComboBox.getSelectedItem());
 
         Random random = new Random();
-        int dx = random.nextInt(speed) + 1;
-        int dy = (int) Math.sqrt(speed * speed - dx * dx);
-        Figure figure = new Figure(0, 0, dx, dy, 30, selectedColor, content, number, isImage);
-        figure.setSpeed(speed, speed);
+        int dx = random.nextInt(21) - 10; // Генерируем случайное значение dx в диапазоне [-10, 10]
+        int dy = random.nextInt(21) - 10; // Генерируем случайное значение dy в диапазоне [-10, 10]
+
+        while (dx * dx + dy * dy > 100) {
+            dx = random.nextInt(21) - 10;
+            dy = random.nextInt(21) - 10;
+        }
+        Figure figure = new Figure(0, 0, dx, dy, 30, color, content, number, isImage);
+
         demoPanel.addFigure(figure);
-        figureComboBox.addItem(content + ", ID=" + number);
         usedNumbers.add(number);
 
         clearFields(); // Очищаем текстовые поля после добавления объекта
@@ -103,72 +137,99 @@ public class Test extends JFrame {
     }
 
     private void editFigure() {
-        String selectedFigure = (String) figureComboBox.getSelectedItem();
-        if (selectedFigure == null || selectedFigure.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Выберите объект для редактирования.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+        int number;
+        try {
+            number = Integer.parseInt(selectField.getText());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Номер должен быть числом.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!usedNumbers.contains(number)) {
+            JOptionPane.showMessageDialog(this, "Номер не используется", "Ошибка", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int number = Integer.parseInt(selectedFigure.split("=")[1]);
         Figure figure = demoPanel.getFigureByNumber(number);
 
         if (figure != null) {
+            int newSpeed, newNumber;
+            Color newColor;
             try {
-                int newSpeed = Integer.parseInt((String) speedComboBox.getSelectedItem());
-
-                figure.setSpeed(newSpeed, newSpeed); // Простое назначение скорости одинаково по x и y
-                figure.setColor(selectedColor);
-
-                // Обновление текста фигуры
-                String newContent = contentField.getText().toLowerCase();
-                boolean isImage = validContents.contains(newContent);
-                figure.setContent(newContent, isImage);
-
-                // Обновление ID фигуры
-                int newNumber = Integer.parseInt(numberField.getText());
-                if (newNumber != figure.number) {
-                    if (usedNumbers.contains(newNumber)) {
-                        JOptionPane.showMessageDialog(this, "Номер уже используется. Введите уникальный номер.", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    usedNumbers.remove(figure.number);
-                    figure.setNumber(newNumber);
-                    usedNumbers.add(newNumber);
+                 newSpeed = Integer.parseInt(newSpeedField.getText());
+                if (newSpeed <= 0 || newSpeed > 20) {
+                    JOptionPane.showMessageDialog(this, "Скорость должна быть в диапазоне от 1 до 20.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
-
-                // Обновление списка фигур
-                figureComboBox.removeItem(selectedFigure);
-                figureComboBox.addItem(figure.content + ", ID=" + newNumber);
-
-                clearFields(); // Очищаем текстовые поля после изменения объекта
+                 newNumber = Integer.parseInt(newNuberField.getText());
+                 newColor = getColorFromName((String) newcolorComboBox.getSelectedItem());
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Скорость должна быть числом.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Номер должен быть числом.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                return;
             }
+
+            if (newNumber != figure.number && usedNumbers.contains(newNumber)) {
+                JOptionPane.showMessageDialog(this, "Номер уже используется. Введите уникальный номер.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            figure.setSpeed(newSpeed, newSpeed); // Простое назначение скорости одинаково по x и y
+            figure.setColor(newColor);
+            figure.setNumber(newNumber);
+            // Обновление текста фигуры
+            String newContent = (String) newcontendComboBox.getSelectedItem();
+
+            boolean isImage = validContents.contains(newContent);
+            figure.setContent(newContent, isImage);
+            clearFields(); // Очищаем текстовые поля после изменения объекта
         }
     }
 
-    private void loadFigureData() {
-        String selectedFigure = (String) figureComboBox.getSelectedItem();
-        if (selectedFigure == null || selectedFigure.isEmpty()) {
-            return;
+    private Color getColorFromName(String colorName) {
+        switch (colorName.toLowerCase()) {
+            case "красный":
+                return Color.RED;
+            case "зеленый":
+                return Color.GREEN;
+            case "синий":
+                return Color.BLUE;
+            case "желтый":
+                return Color.YELLOW;
+            case "черный":
+                return Color.BLACK;
+            default:
+                return Color.BLACK;
         }
-
-        int number = Integer.parseInt(selectedFigure.split("=")[1]);
+    }
+    private void loadFigureData() {
+        int number = Integer.parseInt(selectField.getText());
         Figure figure = demoPanel.getFigureByNumber(number);
 
         if (figure != null) {
-            contentField.setText(figure.content);
-            speedComboBox.setSelectedItem("" + figure.getSpeed() / 10);
-            numberField.setText("" + figure.number);
-            selectedColor = figure.color; // Обновляем выбранный цвет
+            newSpeedField.setText(String.valueOf(figure.getSpeed()));
+            newNuberField.setText(String.valueOf(figure.number));
+            newcontendComboBox.setSelectedItem(figure.content);
+            String colorName = "Черный";
+            if (figure.color.equals(Color.RED)) {
+                colorName = "Красный";
+            } else if (figure.color.equals(Color.GREEN)) {
+                colorName = "Зеленый";
+            } else if (figure.color.equals(Color.BLUE)) {
+                colorName = "Синий";
+            } else if (figure.color.equals(Color.YELLOW)) {
+                colorName = "Желтый";
+            }
+            newcolorComboBox.setSelectedItem(colorName);
         }
     }
 
     private void clearFields() {
-        contentField.setText("");
+        contendComboBox.setSelectedIndex(0);
+        speedField.setText("");
+//        speedComboBox.setSelectedIndex(0);
+        newNuberField.setText("");
         numberField.setText("");
-        speedComboBox.setSelectedIndex(0);
-        figureComboBox.setSelectedIndex(0);
+        selectField.setText("");
+        newcontendComboBox.setSelectedIndex(0);
+        newcolorComboBox.setSelectedIndex(0);
     }
 
     public static void main(String[] args) {
