@@ -117,10 +117,14 @@ public class Test extends JFrame {
         Color color = getColorFromName((String) colorComboBox.getSelectedItem());
 
         Random random = new Random();
-        int dx = random.nextInt(speed) + 1;
-        int dy = (int) Math.sqrt(speed * speed - dx * dx);
+        int dx = random.nextInt(21) - 10; // Генерируем случайное значение dx в диапазоне [-10, 10]
+        int dy = random.nextInt(21) - 10; // Генерируем случайное значение dy в диапазоне [-10, 10]
+
+        while (dx * dx + dy * dy > 100) {
+            dx = random.nextInt(21) - 10;
+            dy = random.nextInt(21) - 10;
+        }
         Figure figure = new Figure(0, 0, dx, dy, 30, color, shape, number);
-        figure.setSpeed(speed, speed);
 
         demoPanel.addFigure(figure);
         figureComboBox.addItem(shape + ", ID=" + number);
