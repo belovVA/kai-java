@@ -93,10 +93,10 @@ public class Test extends JFrame {
         Color color = getColorFromName((String) colorComboBox.getSelectedItem());
 
         Random random = new Random();
-        int dx = random.nextInt(speed) + 1;
-        int dy = (int) Math.sqrt(speed * speed - dx * dx);
+        int dx = random.nextInt(10);
+        int dy = (int) Math.sqrt(10 - dx * dx);
         Figure figure = new Figure(0, 0, dx, dy, 30, color, shape, number);
-        figure.setSpeed(speed, speed);
+//        figure.setSpeed(speed, speed);
         demoPanel.addFigure(figure);
         figureComboBox.addItem(shape + ", ID=" + number);
         usedNumbers.add(number);
